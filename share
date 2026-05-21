@@ -1,0 +1,39 @@
+@router.get("/", include_in_schema=False)
+def home(request: Request) -> FileResponse:
+    """Serve the demo landing page — only if authenticated."""
+    token = request.session.get("access_token")
+    if not token:
+        # Clear any stale cookies silently
+        request.session.clear()
+        return RedirectResponse(url="/auth/login")
+    return FileResponse(_INDEX_HTML, media_type="text/html")
+
+
+
+
+
+
+
+
+
+
+@router.get("/auth/login")
+async def login(request: Request):
+    """Redirect user to SSO login page."""
+    request.session.clear()
+    settings = _settings()
+    # ... rest stays the same
+
+
+
+
+@router.get("/me")
+def get_me(user: dict = Depends(get_current_user)):
+    """return the decoded JWT payload"""
+    return {
+        "sub": user.get("sub"),
+        "email": user.get("email"),
+        "name": user.get("name"),
+        "given_name": user.get("given_name"),
+        "family_name": user.get("family_name"),
+    }
